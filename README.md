@@ -63,8 +63,8 @@ For this deliverable I built out the structure of my application using HTML.
 For this deliverable I properly styled the application into its final appearance.
 
 - [] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
-- [] **Visually appealing colors and layout. No overflowing elements.** - Looks great, but maybe needs more work on the bouncy ball shadow.
-- [x] **Use of a CSS framework** - I used bootstrap for the button for the search bar
+- [] **Visually appealing colors and layout. No overflowing elements.** - \
+- [x] **Use of a CSS framework** - I used bootstrap for the button for he search bar
 - [] **All visual elements styled using CSS** - WIP
 - [] **Responsive to window resizing using flexbox and/or grid display** - 
 - [x] **Use of a imported font** - "Oi" being used for the title on the top
