@@ -74,7 +74,7 @@ For this deliverable I properly styled the application into its final appearance
 
 For this deliverable I used JavaScript and React so that the application completely works for a single user. I also added placeholders for future technology.
 
-- [ ] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
-- [ ] **Bundled using Vite** - So amazing what Vite does. Bundling, transpiling, minifying, and HMR.
-- [ ] **Components** - I have three components: The app, the ballot items, and a bouncy ball.
-- [ ] **Router** - Routing between login and voting components.
+- [x] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
+- [x] **Bundled using Vite** - Bundled and deployed usin Vite.
+- [x] **Components** - Created components for all the different pages.
+- [x] **Router** - Routing between home and all the other pages.
