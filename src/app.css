@@ -6,7 +6,7 @@
   box-sizing: border-box;
 }
 
-body {
+.body {
   margin: 25;
   background-color: #ffffff;
   font-family: 'Noto Sans JP', system-ui, sans-serif;

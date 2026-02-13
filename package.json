@@ -1,0 +1,33 @@
+{
+  "name": "startup",
+  "version": "1.0.0",
+  "description": "Movies, TV shows, games, all of them have many websites dedicated to rating and keeping track of experienced media. However, music has no such mainstream equivalent. Rather than the limited information coveyed by just sharing playlists, the application with allow users to display all time favourite artists and songs and currently listening music, catalog and write reviews on listened music which they may not want to have on personal playlists, and view ratings by other users. This allows more flexibility and expression in users' ability to share and find new music.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lauk24/startup.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/lauk24/startup/issues"
+  },
+  "homepage": "https://github.com/lauk24/startup#readme",
+  "devDependencies": {
+    "vite": "^7.3.1"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.8",
+    "react": "^19.2.4",
+    "react-bootstrap": "^2.10.10",
+    "react-dom": "^19.2.4",
+    "react-router-dom": "^7.13.0"
+  }
+}

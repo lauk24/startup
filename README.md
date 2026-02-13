@@ -62,10 +62,19 @@ For this deliverable I built out the structure of my application using HTML.
 
 For this deliverable I properly styled the application into its final appearance.
 
-- [] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
-- [] **Visually appealing colors and layout. No overflowing elements.** - \
+- [ ] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
+- [ ] **Visually appealing colors and layout. No overflowing elements.** - \
 - [x] **Use of a CSS framework** - I used bootstrap for the button for he search bar
-- [] **All visual elements styled using CSS** - WIP
-- [] **Responsive to window resizing using flexbox and/or grid display** - 
+- [ ] **All visual elements styled using CSS** - WIP
+- [ ] **Responsive to window resizing using flexbox and/or grid display** - 
 - [x] **Use of a imported font** - "Oi" being used for the title on the top
-- [] **Use of different types of selectors including element, class, ID, and pseudo selectors** - 
+- [ ] **Use of different types of selectors including element, class, ID, and pseudo selectors** - 
+
+## React Phase 1: Routing deliverable
+
+For this deliverable I used JavaScript and React so that the application completely works for a single user. I also added placeholders for future technology.
+
+- [ ] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
+- [ ] **Bundled using Vite** - So amazing what Vite does. Bundling, transpiling, minifying, and HMR.
+- [ ] **Components** - I have three components: The app, the ballot items, and a bouncy ball.
+- [ ] **Router** - Routing between login and voting components.
