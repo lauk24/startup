@@ -45,7 +45,7 @@ function AppContent({ userName, authState, onAuthChange }) {
                 <ul>
                     <li><NavLink to="profile">Profile</NavLink></li>
                     <li><NavLink to="library">My Library</NavLink></li>
-                    
+                    <li><NavLink to="/">Sign Out</NavLink></li>
                 </ul>
             </nav>
         </header>
