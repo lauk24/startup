@@ -7,17 +7,35 @@ export function Login({ userName, authState, onAuthChange }) {
   const [password, setPassword] = React.useState('');
     const navigate = useNavigate();
 
-  function loginUser() {
-    localStorage.setItem('userName', email);
-    onAuthChange(email, AuthState.Authenticated);
-    navigate('/library');
+function createUser() {
+  const users = JSON.parse(localStorage.getItem('users')) || [];
+  
+  if (users.find((u) => u.email === email)) {
+    alert('Email already registered!');
+    return;
   }
 
-  function createUser() {
-    localStorage.setItem('userName', email);
-    onAuthChange(email, AuthState.Authenticated);
-    navigate('/library');
+  const updated = [...users, { email, password }];
+  localStorage.setItem('users', JSON.stringify(updated));
+  localStorage.setItem('userName', email);
+  onAuthChange(email, AuthState.Authenticated);
+  navigate('/library');
+}
+
+function loginUser() {
+  const users = JSON.parse(localStorage.getItem('users')) || [];
+  
+  const user = users.find((u) => u.email === email && u.password === password);
+  
+  if (!user) {
+    alert('Invalid email or password!');
+    return;
   }
+
+  localStorage.setItem('userName', email);
+  onAuthChange(email, AuthState.Authenticated);
+  navigate('/library');
+}
 
   return (
     <main>
