@@ -59,7 +59,7 @@ function AppContent({ userName, authState, onAuthChange }) {
                   onAuthChange={onAuthChange}
                 />
               }/>
-              <Route path='/add-rating' element={<AddRating />} />
+              <Route path='/add-rating/:id' element={<AddRating />} />
               <Route path='/library' element={<Library />} />
               <Route path='/profile' element={<Profile />} />
               <Route path='/search-results' element={<SearchResults />} />

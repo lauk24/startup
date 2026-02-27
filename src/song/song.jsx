@@ -58,7 +58,7 @@ export function Song() {
                     <li>Other 2</li>
                 </ul>
             </section>
-            <Link to="/add-rating">
+            <Link to={`/add-rating/${song.id}`}>
                 <img src="/addButton.png" alt="Add Rating" width="100" height="100"/>
             </Link>
         </main>
