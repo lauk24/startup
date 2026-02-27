@@ -83,6 +83,6 @@ For this deliverable I used JavaScript and React so that the application complet
 
 For this deliverable I used JavaScript and React so that the application completely works for a single user. I also added placeholders for future technology.
 
-- [x] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
-- [ ] **All functionality implemented or mocked out** - 
+- [x] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits).
+- [x] **All functionality implemented or mocked out** - Completed all functionality and put in mock data to display that will be replaced once we start calling APIs.
 - [x] **Hooks** - Used `useState` and `useEffect` on the login and search functionalities.
