@@ -2,10 +2,29 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useSearchParams } from 'react-router-dom';
 
+function SongCard({song}){
+    return (
+        <div className='song-card'>
+            <img src={song.albumCover} alt="Album Art" width="100" height="100"/>
+            <div>
+                <p>{song.title}</p>
+                <p>{song.artist}</p>
+                <p>{song.album}</p>
+            </div>
+        </div>
+        );
+    }
+
+const mockResults = [
+  { id: 1, title: 'Bohemian Rhapsody', artist: 'Queen', album: 'A Night at the Opera', albumCover: 'song_cover.jpg' },
+  { id: 2, title: 'Blinding Lights', artist: 'The Weeknd', album: 'After Hours', albumCover: 'song_cover.jpg' },
+];
+
 export function SearchResults() {
     const [searchParams] = useSearchParams();
     const query = searchParams.get('q');
-    const [sortby, setSortby] = React.useState('rating');
+    const [sortBy, setSortby] = React.useState('rating');
+    
     return (
         <main>
             <section>
@@ -21,68 +40,9 @@ export function SearchResults() {
                     </select>
                 </form>
             </section>
-            <ul className="search-list">
-                <li>
-                    <NavLink to="/song">
-                        <img src="song_cover.jpg" alt="Album Art" width="100" height="100"/>
-                    </NavLink>
-                    <span className="song-title">Searched Song #1</span>
-                </li>
-                <li>
-                    <NavLink to="/song">
-                        <img src="song_cover.jpg" alt="Album Art" width="100" height="100"/>
-                    </NavLink>
-                    <span className="song-title">Searched Song #2</span>
-                </li>
-                <li>
-                    <NavLink to="/song">
-                        <img src="song_cover.jpg" alt="Album Art" width="100" height="100"/>
-                    </NavLink>
-                    <span className="song-title">Searched Song #3</span>
-                </li>
-                <li>
-                    <NavLink to="/song">
-                        <img src="song_cover.jpg" alt="Album Art" width="100" height="100"/>
-                    </NavLink>
-                    <span className="song-title">Searched Song #4</span>
-                </li>
-                <li>
-                    <NavLink to="/song">
-                        <img src="song_cover.jpg" alt="Album Art" width="100" height="100"/>
-                    </NavLink>
-                    <span className="song-title">Searched Song #5</span>
-                </li>
-                <li>
-                    <NavLink to="/song">
-                        <img src="song_cover.jpg" alt="Album Art" width="100" height="100"/>
-                    </NavLink>
-                    <span className="song-title">Searched Song #6</span>
-                </li>
-                <li>
-                    <NavLink to="/song">
-                        <img src="song_cover.jpg" alt="Album Art" width="100" height="100"/>
-                    </NavLink>
-                    <span className="song-title">Searched Song #7</span>
-                </li>
-                <li>
-                    <NavLink to="/song">
-                        <img src="song_cover.jpg" alt="Album Art" width="100" height="100"/>
-                    </NavLink>
-                    <span className="song-title">Searched Song #8</span>
-                </li>
-                <li>
-                    <NavLink to="/song">
-                        <img src="song_cover.jpg" alt="Album Art" width="100" height="100"/>
-                    </NavLink>
-                    <span className="song-title">Searched Song #9</span>
-                </li>
-                <li>
-                    <NavLink to="/song">
-                        <img src="song_cover.jpg" alt="Album Art" width="100" height="100"/>
-                    </NavLink>
-                    <span className="song-title">Searched Song #10</span>
-                </li>
-            </ul>
+            <div className="search-list">
+                {mockResults.map((song) => <SongCard key={song.id} song={song} />)}
+            </div>
         </main>
     );
 }
