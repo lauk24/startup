@@ -43,9 +43,9 @@ function AppContent({ userName, authState, onAuthChange }) {
             <SearchForm />   
             <nav>
                 <ul>
-                    <li><NavLink to="/">Home</NavLink></li>
                     <li><NavLink to="profile">Profile</NavLink></li>
                     <li><NavLink to="library">My Library</NavLink></li>
+                    
                 </ul>
             </nav>
         </header>
@@ -63,7 +63,7 @@ function AppContent({ userName, authState, onAuthChange }) {
               <Route path='/library' element={<Library />} />
               <Route path='/profile' element={<Profile />} />
               <Route path='/search-results' element={<SearchResults />} />
-              <Route path='/song' element={<Song />} />
+              <Route path='/song/:id' element={<Song />} />
               <Route path='*' element={<NotFound />} />
           </Routes>
       </main>

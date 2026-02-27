@@ -1,11 +1,13 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useSearchParams } from 'react-router-dom';
 
 function SongCard({song}){
     return (
         <div className='song-card'>
-            <img src={song.albumCover} alt="Album Art" width="100" height="100"/>
+            <Link to={`/song/${song.id}`}>
+                <img src={song.albumCover} alt="Album Art" width="100" height="100"/>
+            </Link>
             <div>
                 <p>{song.title}</p>
                 <p>{song.artist}</p>
@@ -16,8 +18,10 @@ function SongCard({song}){
     }
 
 const mockResults = [
-  { id: 1, title: 'Bohemian Rhapsody', artist: 'Queen', album: 'A Night at the Opera', albumCover: 'song_cover.jpg' },
-  { id: 2, title: 'Blinding Lights', artist: 'The Weeknd', album: 'After Hours', albumCover: 'song_cover.jpg' },
+  { id: 1, title: 'Bohemian Rhapsody', artist: 'Queen', album: 'A Night at the Opera', albumCover: 'song_cover.jpg', rating: 9},
+  { id: 2, title: 'Blinding Lights', artist: 'The Weeknd', album: 'After Hours', albumCover: 'song_cover.jpg', rating: 8},
+  { id: 3, title: 'Shape of You', artist: 'Ed Sheeran', album: 'Divide', albumCover: 'song_cover.jpg', rating: 7},
+  { id: 4, title: 'Seaside Rendezvous', artist: "Queen", album: 'A Night at the Opera', albumCover: 'song_cover.jpg', rating: 10}
 ];
 
 export function SearchResults() {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const mockLibrary = [
   { id: 1, title: 'Bohemian Rhapsody', artist: 'Queen', album: 'A Night at the Opera', albumCover: 'song_cover.jpg', rating: 9},
@@ -11,7 +11,9 @@ const mockLibrary = [
 function SongCard({song}){
     return (
         <div className='song-card'>
-            <img src={song.albumCover} alt="Album Art" width="100" height="100"/>
+            <Link to={`/song/${song.id}`}>
+                <img src={song.albumCover} alt="Album Art" width="100" height="100"/>
+            </Link>
             <div>
                 <p>{song.title}</p>
                 <p>{song.artist}</p>
