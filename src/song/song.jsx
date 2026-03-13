@@ -16,7 +16,7 @@ export function Song() {
     return (
         <main>
             <section>
-                <img src={song.albumCover} alt="Album Cover" width="200" height="200"/>
+                <img src={song.albumCover} alt="Album Cover" width="200" height="200" onError={(e) => { e.target.src = '/song_cover.jpg'; }}/>
                 <h2>{song.title}</h2>
                 <h3>{song.artist}</h3>
                 <span>⭐ {song.rating}/10</span>

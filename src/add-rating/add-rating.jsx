@@ -50,7 +50,7 @@ export function AddRating() {
   return (
     <main>
         <section>
-             <img src={song?.albumCover || '/song_cover.jpg'} alt="Album Cover" width="200" height="200"/>
+             <img src={song?.albumCover || '/song_cover.jpg'} alt="Album Cover" width="200" height="200" onError={(e) => { e.target.src = '/song_cover.jpg'; }}/>
             <h2>{song?.title}</h2>
             <h3>{song?.artist}</h3>
             <form onSubmit={uploadRating}>

@@ -5,7 +5,7 @@ function SongCard({song}){
     return (
         <div className='song-card'>
             <Link to={`/song/${song.mbid}`}>
-                <img src={song.albumCover} alt="Album Art" width="100" height="100"/>
+                <img src={song.albumCover} alt="Album Art" width="100" height="100" onError={(e) => { e.target.src = '/song_cover.jpg'; }}/>
             </Link>
             <div>
                 <p>{song.title}</p>

@@ -5,8 +5,8 @@ import { useSearchParams } from 'react-router-dom';
 function SongCard({song}){
     return (
         <div className='song-card'>
-            <Link to={`/song/${song.id}`}>
-                <img src={song.albumCover} alt="Album Art" width="100" height="100"/>
+            <Link to={`/song/${song.mbid}`}>
+                <img src={song.albumCover} alt="Album Art" width="100" height="100" onError={(e) => { e.target.src = '/song_cover.jpg'; }}/>
             </Link>
             <div>
                 <p>{song.title}</p>
@@ -17,18 +17,41 @@ function SongCard({song}){
         );
     }
 
-const mockResults = [
-  { id: 1, title: 'Bohemian Rhapsody', artist: 'Queen', album: 'A Night at the Opera', albumCover: 'song_cover.jpg', rating: 9},
-  { id: 2, title: 'Blinding Lights', artist: 'The Weeknd', album: 'After Hours', albumCover: 'song_cover.jpg', rating: 8},
-  { id: 3, title: 'Shape of You', artist: 'Ed Sheeran', album: 'Divide', albumCover: 'song_cover.jpg', rating: 7},
-  { id: 4, title: 'Seaside Rendezvous', artist: "Queen", album: 'A Night at the Opera', albumCover: 'song_cover.jpg', rating: 10}
-];
-
 export function SearchResults() {
     const [searchParams] = useSearchParams();
     const query = searchParams.get('q');
     const [sortBy, setSortby] = React.useState('rating');
+    const [results, setResults] = React.useState([]);
+    const [loading, setLoading] = React.useState(false);
     
+    React.useEffect(() => {
+        if (!query) return;
+        setLoading(true);
+        fetch(`https://musicbrainz.org/ws/2/recording/?query=${encodeURIComponent(query)}&limit=10&fmt=json`, {
+                headers: {'User-Agent': 'SoundEscape/1.0 (lauk24@byu.edu)'}
+        })
+        .then((res) => res.json())
+        .then((data) => {
+            const songs = data.recordings.map((recording) => ({
+                mbid: recording.id,
+                title: recording.title,
+                artist: recording['artist-credit']?.[0]?.name ?? 'Unknown Artist',
+                album: recording.releases?.[0]?.title ?? 'Unknown Album',
+                releaseId: recording.releases?.[0]?.id ?? null,
+                albumCover: recording.releases?.[0]?.id
+                    ? `https://coverartarchive.org/release/${recording.releases[0].id}/front`
+                    : '/song_cover.jpg',
+            }));
+            setResults(songs);
+        })
+        .catch(() => {
+            setResults([]);
+        })
+        .finally(() => {
+            setLoading(false);
+        });
+    }, [query]);
+
     return (
         <main>
             <section>
@@ -44,8 +67,9 @@ export function SearchResults() {
                     </select>
                 </form>
             </section>
+            {loading && <p>Searching...</p>} 
             <div className="search-list">
-                {mockResults.map((song) => <SongCard key={song.id} song={song} />)}
+                {results.map((song) => <SongCard key={song.mbid} song={song} />)}
             </div>
         </main>
     );
