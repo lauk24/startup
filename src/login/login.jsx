@@ -5,37 +5,33 @@ import { AuthState } from './authState';
 export function Login({ userName, authState, onAuthChange }) {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-    const navigate = useNavigate();
+  const [displayError, setDisplayError] = React.useState(null);
+  const navigate = useNavigate();
 
-function createUser() {
-  const users = JSON.parse(localStorage.getItem('users')) || [];
-  
-  if (users.find((u) => u.email === email)) {
-    alert('Email already registered!');
-    return;
+  async function loginUser() {
+    loginOrCreate('/api/auth/login');
   }
 
-  const updated = [...users, { email, password }];
-  localStorage.setItem('users', JSON.stringify(updated));
-  localStorage.setItem('userName', email);
-  onAuthChange(email, AuthState.Authenticated);
-  navigate('/library');
-}
-
-function loginUser() {
-  const users = JSON.parse(localStorage.getItem('users')) || [];
-  
-  const user = users.find((u) => u.email === email && u.password === password);
-  
-  if (!user) {
-    alert('Invalid email or password!');
-    return;
+  async function createUser() {
+    loginOrCreate('/api/auth/create');
   }
 
-  localStorage.setItem('userName', email);
-  onAuthChange(email, AuthState.Authenticated);
-  navigate('/library');
-}
+  async function loginOrCreate(endpoint) {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (response.ok) {
+      localStorage.setItem('userName', email);
+      onAuthChange(email, AuthState.Authenticated);
+      navigate('/library');
+    } else {
+      const body = await response.json();
+      setDisplayError(`⚠ Error: ${body.msg}`);
+    }
+  }
 
   return (
     <main>
@@ -43,18 +39,18 @@ function loginUser() {
       <div>
         <div>
           <span>@</span>
-          <input 
-            type='text' 
+          <input
+            type='text'
             value={email}
-            onChange={(e) => setEmail(e.target.value)} 
+            onChange={(e) => setEmail(e.target.value)}
             placeholder='your@email.com'
           />
         </div>
         <div>
           <span>🔒</span>
-          <input 
-            type='password' 
-            onChange={(e) => setPassword(e.target.value)} 
+          <input
+            type='password'
+            onChange={(e) => setPassword(e.target.value)}
             placeholder='password'
           />
         </div>
@@ -65,6 +61,12 @@ function loginUser() {
           Create Account
         </button>
       </div>
+
+      {displayError && (
+        <div onClick={() => setDisplayError(null)}>
+          {displayError}
+        </div>
+      )}
     </main>
   );
 }
