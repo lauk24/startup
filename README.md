@@ -86,3 +86,16 @@ For this deliverable I used JavaScript and React so that the application complet
 - [x] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits).
 - [x] **All functionality implemented or mocked out** - Completed all functionality and put in mock data to display that will be replaced once we start calling APIs.
 - [x] **Hooks** - Used `useState` and `useEffect` on the login and search functionalities.
+
+## Service deliverable
+
+For this deliverable I added backend endpoints that receives votes and returns the voting totals.
+
+- [x] I completed the prerequisites for this deliverable (Simon deployed, GitHub link, Git commits)
+- [x] **Node.js/Express HTTP service** - done!
+- [x] **Static middleware for frontend** - done!
+- [x] **Calls to third party endpoints** - I didn't have time to implement this. 😔
+- [x] **Backend service endpoints** - Stored the currentuser as well as their ratings and reviews.
+- [x] **Frontend calls service endpoints** - I did this using the fetch the current user and their libraries.
+- [x] **Supports registration, login, logout, and restricted endpoint** - Login only exists on the frontend.
+- [x] **Uses BCrypt to hash passwords** - This is found in the login.jsx file.
