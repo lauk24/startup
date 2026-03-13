@@ -28,7 +28,7 @@ export function SearchResults() {
         if (!query) return;
         setLoading(true);
         fetch(`https://musicbrainz.org/ws/2/recording/?query=${encodeURIComponent(query)}&limit=10&fmt=json`, {
-                headers: {'User-Agent': 'SoundEscape/1.0 (lauk24@byu.edu)'}
+                headers: {'User-Agent': 'SoundEscape/1.0 (kentlau@byu.edu)'}
         })
         .then((res) => res.json())
         .then((data) => {

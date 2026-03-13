@@ -2,34 +2,69 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 
-const songList = [
-  { id: 1, title: 'Bohemian Rhapsody', artist: 'Queen', album: 'A Night at the Opera', albumCover: '/song_cover.jpg', rating: 9, tags: ["Rock", "Hype"], credits: {artists: ["Queen"], performers: ["Brian May", "Freddie Mercury"], writers: ["Freddy Mercury"], production: ["Bob Ludwig"], other: []}},
-  { id: 2, title: 'Blinding Lights', artist: 'The Weeknd', album: 'After Hours', albumCover: '/song_cover.jpg', rating: 8, tags:["Nostalgia"], credits: {artists: ["The Weekend"], performers: ["Max Martin"], writers: [], production: [], other: []}},
-  { id: 3, title: 'Shape of You', artist: 'Ed Sheeran', album: 'Divide', albumCover: '/song_cover.jpg', rating: 7, tags: ["Love", "Dance"], credits: {artists: ["Ed Sheeran"], performers: ["Ed Sheeran", "Chris Laws"], writers: [], production: [], other: []}},
-  { id: 4, title: 'Seaside Rendezvous', artist: "Queen", album: 'A Night at the Opera', albumCover: '/song_cover.jpg', rating: 10, tags: ["Summer"], credits: {artists: ["Queen"], performers: ["Brian May", "Freddie Mercury"], writers: ["Freddy Mercury"], production: ["Bob Ludwig"], other: []}}
-];
-
-
 export function Song() {
     const { id } = useParams();
-    const song = songList.find((s) => s.id === Number(id));
+    const [song, setSong] = React.useState(null);
+    const [tags, setTags] = React.useState([]);
+    const [albumCover, setAlbumCover] = React.useState('/song_cover.jpg');
+    const [communityRating, setCommunityRating] = React.useState(null);
+    const [loading, setLoading] = React.useState(true);
+
+    React.useEffect(() => {
+        if (!id) return;
+
+        fetch(`https://musicbrainz.org/ws/2/recording/${id}?inc=artist-credits+releases+tags+artist-rels&fmt=json`, {
+            headers: { 'User-Agent': 'SoundEscape/1.0 (kentlau@byu.edu)' }
+        })
+        .then((res) => res.json())
+        .then((data) => {
+            setSong({
+                mbid: data.id,
+                title: data.title,
+                artist: data['artist-credit']?.[0]?.name ?? 'Unknown Artist',
+                album: data.releases?.[0]?.title ?? 'Unknown Album',
+                releaseId: data.releases?.[0]?.id ?? null,
+            })
+            const releaseId = data.releases?.[0]?.id;
+            if (releaseId) {
+                setAlbumCover(`https://coverartarchive.org/release/${releaseId}/front`);
+            }
+        })
+        .catch(() => {
+            setLoading(false);
+        })
+        .finally(() => {
+            setLoading(false);
+        });
+        fetch(`/api/ratings/${id}`)
+            .then((res) => res.json())
+            .then((data) => setCommunityRating(data.averageRating))
+            .catch(() => setCommunityRating(null));
+
+    }, [id]);
+
+    if (loading) return <main><p>Loading...</p></main>;
+    if (!song) return <main><p>Song not found.</p></main>;
+
     return (
         <main>
             <section>
-                <img src={song.albumCover} alt="Album Cover" width="200" height="200" onError={(e) => { e.target.src = '/song_cover.jpg'; }}/>
+                <img src={albumCover} alt="Album Cover" width="200" height="200" onError={(e) => { e.target.src = '/song_cover.jpg'; }}/>
                 <h2>{song.title}</h2>
                 <h3>{song.artist}</h3>
-                <span>⭐ {song.rating}/10</span>
+                {communityRating && <span>⭐ Community Rating: {communityRating.toFixed(1)}/10</span>}
                 <hr />
             </section>
 
             <section>
-                <ul className="tags">
-                    {song.tags.map((tag) => (
-                        <li key={tag}>{tag}</li>
-                    ))}
-                </ul>
-
+                {tags.length > 0 && (
+                    <ul className="tags">
+                        {tags.map((tag) => (
+                            <li key={tag}>{tag}</li>
+                        ))}
+                    </ul>
+                )}    
+                {/* Consider cutting or rethink implementation
                 <h3>Song Credits:</h3>
 
                 {song.credits.artists.length > 0 && (
@@ -75,9 +110,9 @@ export function Song() {
                         </ul>
                     </>
                 )}
-
+                */}
             </section>
-            <Link to={`/add-rating/${song.id}`}>
+            <Link to={`/add-rating/${song.mbid}`}>
                 <img src="/addButton.png" alt="Add Rating" width="100" height="100"/>
             </Link>
         </main>
