@@ -8,7 +8,25 @@ const authCookieName = 'token';
 
 // The scores and users are saved in memory and disappear whenever the service is restarted.
 let users = [];
-let scores = [];
+let globalRatings = [];
+
+function createRating(mbid, rating, spTags = [], review = '') {
+  return {
+    mbid,
+    rating,
+    spTags,
+    dateAdded: new Date().toISOString(),
+    review
+  };
+}
+
+function createGlobalRating(mbid, email, rating) {
+  return {
+    mbid,
+    ratings: [{ email, rating }],
+    averageRating: rating
+  };
+}
 
 // The service port. In production the front-end code is statically hosted by the service on the same port.
 const port = process.argv.length > 2 ? process.argv[2] : 4000;
@@ -72,15 +90,52 @@ const verifyAuth = async (req, res, next) => {
   }
 };
 
-// GetScores
-apiRouter.get('/scores', verifyAuth, (_req, res) => {
-  res.send(scores);
+// Get user's library
+apiRouter.get('/library', verifyAuth, async (req, res) => {
+  const user = await findUser('token', req.cookies[authCookieName]);
+  res.send(user.library);
 });
 
-// SubmitScore
-apiRouter.post('/score', verifyAuth, (req, res) => {
-  scores = updateScores(req.body);
-  res.send(scores);
+// Add or update a rating in user's library and global ratings
+apiRouter.post('/library', verifyAuth, async (req, res) => {
+  const user = await findUser('token', req.cookies[authCookieName]);
+  const { mbid, rating, spTags, review } = req.body;
+
+  // Add to user's library
+  const existingIndex = user.library.findIndex((s) => s.mbid === mbid);
+  const newRating = createRating(mbid, rating, spTags, review);
+  if (existingIndex >= 0) {
+    user.library[existingIndex] = newRating;
+  } else {
+    user.library.push(newRating);
+  }
+
+  // Update global ratings
+  const globalEntry = globalRatings.find((g) => g.mbid === mbid);
+  if (globalEntry) {
+    const existingRating = globalEntry.ratings.find((r) => r.email === user.email);
+    if (existingRating) {
+      existingRating.rating = rating;
+    } else {
+      globalEntry.ratings.push({ email: user.email, rating });
+    }
+    const total = globalEntry.ratings.reduce((sum, r) => sum + r.rating, 0);
+    globalEntry.averageRating = total / globalEntry.ratings.length;
+  } else {
+    globalRatings.push(createGlobalRating(mbid, user.email, rating));
+  }
+
+  res.send(user.library);
+});
+
+// Get global rating for a song
+apiRouter.get('/ratings/:mbid', async (req, res) => {
+  const globalEntry = globalRatings.find((g) => g.mbid === req.params.mbid);
+  if (globalEntry) {
+    res.send(globalEntry);
+  } else {
+    res.status(404).send({ msg: 'No ratings found' });
+  }
 });
 
 // Default error handler
@@ -93,28 +148,6 @@ app.use((_req, res) => {
   res.sendFile('index.html', { root: 'public' });
 });
 
-// updateScores considers a new score for inclusion in the high scores.
-function updateScores(newScore) {
-  let found = false;
-  for (const [i, prevScore] of scores.entries()) {
-    if (newScore.score > prevScore.score) {
-      scores.splice(i, 0, newScore);
-      found = true;
-      break;
-    }
-  }
-
-  if (!found) {
-    scores.push(newScore);
-  }
-
-  if (scores.length > 10) {
-    scores.length = 10;
-  }
-
-  return scores;
-}
-
 async function createUser(email, password) {
   const passwordHash = await bcrypt.hash(password, 10);
 
@@ -122,6 +155,7 @@ async function createUser(email, password) {
     email: email,
     password: passwordHash,
     token: uuid.v4(),
+    library: []
   };
   users.push(user);
 
