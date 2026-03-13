@@ -1,20 +1,39 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
-const mockLibrary = [
-  { mbid: '1', title: 'Bohemian Rhapsody', artist: 'Queen', album: 'A Night at the Opera', albumCover: 'song_cover.jpg', rating: 9, spTags: ["obs", "fav"], dateAdded: "2025-12-02"},
-  { mbid: '2', title: 'Blinding Lights', artist: 'The Weeknd', album: 'After Hours', albumCover: 'song_cover.jpg', rating: 8, spTags: ["fav"], dateAdded: "2026-01-21"},
-  { mbid: '3', title: 'Shape of You', artist: 'Ed Sheeran', album: 'Divide', albumCover: 'song_cover.jpg', rating: 7, spTags: [], dateAdded: "2025-12-20"},
-  { mbid: '4', title: 'Seaside Rendezvous', artist: "Queen", album: 'A Night at the Opera', albumCover: 'song_cover.jpg', rating: 10, spTags: ["obs"], dateAdded: "2026-02-26"}
-];
-
 export function AddRating() {
   const { id } = useParams();
-  const song = mockLibrary.find((s) => s.mbid === id);
   const navigate = useNavigate();
+  const [song, setSong] = React.useState(null);
+  const [albumCover, setAlbumCover] = React.useState('/song_cover.jpg');
   const [rating, setRating] = React.useState("");
   const [review, setReview] = React.useState('');
   const [spTags, setSpTags] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    if (!id) return;
+
+    fetch(`https://musicbrainz.org/ws/2/recording/${id}?inc=artist-credits+releases&fmt=json`, {
+      headers: { 'User-Agent': 'SoundEscape/1.0 (kentlau@byu.edu)' }
+    })
+    .then((res) => res.json())
+    .then((data) => {
+      setSong({
+        mbid: data.id,
+        title: data.title,
+        artist: data['artist-credit']?.[0]?.name ?? 'Unknown Artist',
+        album: data.releases?.[0]?.title ?? 'Unknown Album',
+        releaseId: data.releases?.[0]?.id ?? null,
+      });
+      const releaseId = data.releases?.[0]?.id;
+      if (releaseId) {
+        setAlbumCover(`https://coverartarchive.org/release/${releaseId}/front`);
+      }
+    })
+    .catch(() => {})
+    .finally(() => setLoading(false));
+  }, [id]);
 
   async function uploadRating(e) {
     e.preventDefault()
@@ -27,7 +46,7 @@ export function AddRating() {
         title: song?.title,
         artist: song?.artist,
         album: song?.album,
-        albumCover: song?.albumCover,
+        albumCover: albumCover,
         spTags: spTags,
         review: review
       })
@@ -38,21 +57,23 @@ export function AddRating() {
   }
 
   function toggleTag(tag) {
-  setSpTags((prev) => {
-    if (prev.includes(tag)) {
-      return prev.filter((t) => t !== tag);
-    } else {
-      return [...prev, tag];         
-    }
-  });
-}
+    setSpTags((prev) => {
+      if (prev.includes(tag)) {
+        return prev.filter((t) => t !== tag);
+      } else {
+        return [...prev, tag];         
+      }
+    }); 
+  }
 
+  if (loading) return <main><p>Loading...</p></main>;
+  if (!song) return <main><p>Song not found.</p></main>;
   return (
     <main>
         <section>
-             <img src={song?.albumCover || '/song_cover.jpg'} alt="Album Cover" width="200" height="200" onError={(e) => { e.target.src = '/song_cover.jpg'; }}/>
-            <h2>{song?.title}</h2>
-            <h3>{song?.artist}</h3>
+             <img src={albumCover || '/song_cover.jpg'} alt="Album Cover" width="200" height="200" onError={(e) => { e.target.src = '/song_cover.jpg'; }}/>
+            <h2>{song.title}</h2>
+            <h3>{song.artist}</h3>
             <form onSubmit={uploadRating}>
                 <label htmlFor="rating">Rate this song (0–10):</label>
                 <input 
