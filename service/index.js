@@ -10,10 +10,14 @@ const authCookieName = 'token';
 let users = [];
 let globalRatings = [];
 
-function createRating(mbid, rating, spTags = [], review = '') {
+function createRating(mbid, rating, title, artist, album, albumCover, spTags = [], review = '') {
   return {
     mbid,
     rating,
+    title,
+    artist,
+    album,
+    albumCover,
     spTags,
     dateAdded: new Date().toISOString(),
     review
@@ -99,11 +103,11 @@ apiRouter.get('/library', verifyAuth, async (req, res) => {
 // Add or update a rating in user's library and global ratings
 apiRouter.post('/library', verifyAuth, async (req, res) => {
   const user = await findUser('token', req.cookies[authCookieName]);
-  const { mbid, rating, spTags, review } = req.body;
+  const { mbid, rating, title, artist, album, albumCover, spTags, review } = req.body; 
 
   // Add to user's library
   const existingIndex = user.library.findIndex((s) => s.mbid === mbid);
-  const newRating = createRating(mbid, rating, spTags, review);
+  const newRating = createRating(mbid, rating, title, artist, album, albumCover, spTags, review);
   if (existingIndex >= 0) {
     user.library[existingIndex] = newRating;
   } else {

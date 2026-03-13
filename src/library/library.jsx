@@ -12,6 +12,7 @@ function SongCard({song}){
                 <p>{song.artist}</p>
                 <p>{song.album}</p>
                 <p>⭐ {song.rating}/10</p>
+                {song.review && <p>"{song.review}"</p>}
             </div>
         </div>
         );
