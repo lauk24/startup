@@ -34,7 +34,21 @@ export default function App() {
 
 function AppContent({ userName, authState, onAuthChange }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const isLoginPage = location.pathname === "/";
+
+    function logout() {
+      fetch('/api/auth/logout', { method: 'DELETE' })
+      .catch(() => {
+        // Logout failed, assuming offline
+      })
+      .finally(() => {
+        localStorage.removeItem('userName');
+        onAuthChange('', AuthState.Unauthenticated);
+        navigate('/');
+      });
+    }
+    
   return(
     <div className="body">
       {!isLoginPage && (
@@ -45,7 +59,7 @@ function AppContent({ userName, authState, onAuthChange }) {
                 <ul>
                     <li><NavLink to="profile">Profile</NavLink></li>
                     <li><NavLink to="library">My Library</NavLink></li>
-                    <li><NavLink to="/">Sign Out</NavLink></li>
+                    <li><button onClick={logout}>Sign Out</button></li>
                 </ul>
             </nav>
         </header>
