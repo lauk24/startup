@@ -3,34 +3,9 @@ const bcrypt = require('bcryptjs');
 const express = require('express');
 const uuid = require('uuid');
 const app = express();
+const DB = require('./database.js');
 
 const authCookieName = 'token';
-
-// The scores and users are saved in memory and disappear whenever the service is restarted.
-let users = [];
-let globalRatings = [];
-
-function createRating(mbid, rating, title, artist, album, albumCover, spTags = [], review = '') {
-  return {
-    mbid,
-    rating,
-    title,
-    artist,
-    album,
-    albumCover,
-    spTags,
-    dateAdded: new Date().toISOString(),
-    review
-  };
-}
-
-function createGlobalRating(mbid, email, rating) {
-  return {
-    mbid,
-    ratings: [{ email, rating }],
-    averageRating: rating
-  };
-}
 
 // The service port. In production the front-end code is statically hosted by the service on the same port.
 const port = process.argv.length > 2 ? process.argv[2] : 4000;
@@ -66,6 +41,7 @@ apiRouter.post('/auth/login', async (req, res) => {
   if (user) {
     if (await bcrypt.compare(req.body.password, user.password)) {
       user.token = uuid.v4();
+      await DB.updateUser(user);
       setAuthCookie(res, user.token);
       res.send({ email: user.email });
       return;
@@ -78,7 +54,7 @@ apiRouter.post('/auth/login', async (req, res) => {
 apiRouter.delete('/auth/logout', async (req, res) => {
   const user = await findUser('token', req.cookies[authCookieName]);
   if (user) {
-    delete user.token;
+    await DB.updateUserRemoveAuth(user);
   }
   res.clearCookie(authCookieName);
   res.status(204).end();
@@ -97,7 +73,8 @@ const verifyAuth = async (req, res, next) => {
 // Get user's library
 apiRouter.get('/library', verifyAuth, async (req, res) => {
   const user = await findUser('token', req.cookies[authCookieName]);
-  res.send(user.library);
+  const library = await DB.getLibrary(user.email);
+  res.send(library);
 });
 
 // Add or update a rating in user's library and global ratings
@@ -105,36 +82,36 @@ apiRouter.post('/library', verifyAuth, async (req, res) => {
   const user = await findUser('token', req.cookies[authCookieName]);
   const { mbid, rating, title, artist, album, albumCover, spTags, review } = req.body; 
 
-  // Add to user's library
-  const existingIndex = user.library.findIndex((s) => s.mbid === mbid);
-  const newRating = createRating(mbid, rating, title, artist, album, albumCover, spTags, review);
-  if (existingIndex >= 0) {
-    user.library[existingIndex] = newRating;
+  const existingEntry = (await DB.getLibrary(user.email)).find((e) => e.mbid === mbid);
+  let oldRating;
+  if (existingEntry) {
+    oldRating = existingEntry.rating;
   } else {
-    user.library.push(newRating);
+    oldRating = null;
   }
 
-  // Update global ratings
-  const globalEntry = globalRatings.find((g) => g.mbid === mbid);
-  if (globalEntry) {
-    const existingRating = globalEntry.ratings.find((r) => r.email === user.email);
-    if (existingRating) {
-      existingRating.rating = rating;
-    } else {
-      globalEntry.ratings.push({ email: user.email, rating });
-    }
-    const total = globalEntry.ratings.reduce((sum, r) => sum + r.rating, 0);
-    globalEntry.averageRating = total / globalEntry.ratings.length;
-  } else {
-    globalRatings.push(createGlobalRating(mbid, user.email, rating));
-  }
+  const newEntry = {
+    email: user.email,
+    mbid,
+    rating,
+    title,
+    artist,
+    album,
+    albumCover,
+    spTags,
+    dateAdded: new Date().toISOString(),
+    review
+  };
 
-  res.send(user.library);
+  await DB.addOrUpdateLibraryEntry(user.email, newEntry);
+  await DB.addOrUpdateGlobalRating(mbid, rating, oldRating)
+  const library = await DB.getLibrary(user.email)
+  res.send(library);
 });
 
 // Get global rating for a song
 apiRouter.get('/ratings/:mbid', async (req, res) => {
-  const globalEntry = globalRatings.find((g) => g.mbid === req.params.mbid);
+  const globalEntry = await DB.getGlobalRating(req.params.mbid);
   if (globalEntry) {
     res.send(globalEntry);
   } else {
@@ -158,18 +135,19 @@ async function createUser(email, password) {
   const user = {
     email: email,
     password: passwordHash,
-    token: uuid.v4(),
-    library: []
+    token: uuid.v4()
   };
-  users.push(user);
-
+  await DB.addUser(user)
   return user;
 }
 
 async function findUser(field, value) {
   if (!value) return null;
 
-  return users.find((u) => u[field] === value);
+  if (field === 'token') {
+    return DB.getUserByToken(value);
+  }
+  return DB.getUser(value);
 }
 
 // setAuthCookie in the HTTP response
@@ -182,6 +160,6 @@ function setAuthCookie(res, authToken) {
   });
 }
 
-app.listen(port, () => {
+const httpService = app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
