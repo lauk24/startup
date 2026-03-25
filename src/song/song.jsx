@@ -24,6 +24,7 @@ export function Song() {
                 artist: data['artist-credit']?.[0]?.name ?? 'Unknown Artist',
                 album: data.releases?.[0]?.title ?? 'Unknown Album',
                 releaseId: data.releases?.[0]?.id ?? null,
+                releaseDate: data.releases?.[0]?.date ?? null,
             })
             const releaseId = data.releases?.[0]?.id;
             if (releaseId) {

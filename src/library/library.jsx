@@ -33,7 +33,7 @@ export function Library() {
     const filteredSongs = library.filter((song) =>
         song.title?.toLowerCase().includes(query.toLowerCase()) ||
         song.artist?.toLowerCase().includes(query.toLowerCase())
-);
+    )
 
     return (
         <main>

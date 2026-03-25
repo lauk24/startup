@@ -99,3 +99,10 @@ For this deliverable I added backend endpoints that receives votes and returns t
 - [x] **Frontend calls service endpoints** - I did this using the fetch the current user and their libraries.
 - [x] **Supports registration, login, logout, and restricted endpoint** - Login only exists on the frontend.
 - [x] **Uses BCrypt to hash passwords** - This is found in the login.jsx file.
+
+## 🚀 DB/Login deliverable
+
+For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
+
+- [x] **Stores data in MongoDB** - User's library and global ratings stored in MongoDB from `service/database.js`.
+- [x] **Stores credentials in MongoDB** - Auth stored in MongoDB from `service/database.js`.
