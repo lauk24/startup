@@ -56,7 +56,7 @@ export function Library() {
             </section>
             <div className="library-list">
                 {filteredSongs.map((song) => <SongCard key={song.mbid} song={song}/>)}
-            </div>
+            </div>z
         </main>
     );
 }
