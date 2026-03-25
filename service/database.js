@@ -89,5 +89,3 @@ module.exports = {
   getGlobalRating,
   addOrUpdateGlobalRating
 };
-
-main();
