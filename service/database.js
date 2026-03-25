@@ -40,4 +40,54 @@ async function updateUserRemoveAuth(user) {
   await userCollection.updateOne({ email: user.email }, { $unset: { token: 1 } });
 }
 
+function getLibrary(email) {
+  return libraryCollection.find({ email: email }).toArray();
+}
+
+async function addOrUpdateLibraryEntry(email, entry) {
+    await libraryCollection.updateOne({ email: email, mbid: entry.mbid }, { $set: entry }, { upsert: true })
+}
+
+function getGlobalRating(mbid) {
+    return globalRatingCollection.findOne({ mbid:mbid })
+}
+
+async function addOrUpdateGlobalRating(mbid, newRating, oldRating) {
+    const globalEntry = await getGlobalRating(mbid)
+    if (globalEntry === null){
+        await globalRatingCollection.insertOne({
+            mbid: mbid,
+            averageRating: newRating,
+            ratingCount: 1
+        })
+    } else {
+        let newCount;
+        let newAverage;
+        if (oldRating === null) {
+            newCount = globalEntry.ratingCount + 1;
+            newAverage = (globalEntry.averageRating * globalEntry.ratingCount + newRating)/ newCount;
+        } else {
+            newCount = globalEntry.ratingCount;
+            newAverage = (globalEntry.averageRating * globalEntry.ratingCount + newRating - oldRating)/ newCount;
+        }
+        await globalRatingCollection.updateOne(
+            { mbid: mbid },
+            { $set: { averageRating: newAverage, ratingCount: newCount } }
+        )
+
+    }
+}
+
+module.exports = {
+  getUser,
+  getUserByToken,
+  addUser,
+  updateUser,
+  updateUserRemoveAuth,
+  getLibrary,
+  addOrUpdateLibraryEntry,
+  getGlobalRating,
+  addOrUpdateGlobalRating
+};
+
 main();
