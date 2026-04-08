@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { MusicNotifier, MusicEvent } from '../musicNotifier';
 
 export function AddRating() {
   const { id } = useParams();
@@ -52,7 +53,12 @@ export function AddRating() {
       })
     })
     if (response.ok) {
-      navigate(`/song/${id}`)
+      MusicNotifier.broadcastEvent(
+        'user',
+        MusicEvent.NewRating,
+        { title: song.title, artist: song.artist, rating: Number(rating) }
+      );
+      navigate(`/song/${id}`);
     }
   }
 

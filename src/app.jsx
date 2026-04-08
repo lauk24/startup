@@ -11,6 +11,8 @@ import { SearchResults } from './search-results/search-results';
 import { Song } from './song/song';
 import { AuthState } from './login/authState';
 
+import { MusicNotifier, MusicEvent } from './musicNotifier';
+
 
 export default function App() {
   const [userName, setUserName] = React.useState(localStorage.getItem('userName') || '');
@@ -36,18 +38,30 @@ function AppContent({ userName, authState, onAuthChange }) {
   const location = useLocation();
   const navigate = useNavigate();
   const isLoginPage = location.pathname === "/";
+  const [notif, setNotif] = React.useState(null);
 
-    function logout() {
-      fetch('/api/auth/logout', { method: 'DELETE' })
-      .catch(() => {
-        // Logout failed, assuming offline
-      })
-      .finally(() => {
-        localStorage.removeItem('userName');
-        onAuthChange('', AuthState.Unauthenticated);
-        navigate('/');
-      });
-    }
+  React.useEffect(() => {
+    const handler = (event) => {
+      if (event.type === MusicEvent.NewRating) {
+        setNotif(`${event.value.artist} - ${event.value.title} was rated ${event.value.rating}/10`);
+        setTimeout(() => setNotif(null), 4000);
+      }
+    };
+    MusicNotifier.addHandler(handler);
+    return () => MusicNotifier.removeHandler(handler);
+  }, []);
+
+  function logout() {
+    fetch('/api/auth/logout', { method: 'DELETE' })
+    .catch(() => {
+      // Logout failed, assuming offline
+    })
+    .finally(() => {
+      localStorage.removeItem('userName');
+      onAuthChange('', AuthState.Unauthenticated);
+      navigate('/');
+    });
+  }
     
   return(
     <div className="body">
@@ -62,6 +76,7 @@ function AppContent({ userName, authState, onAuthChange }) {
                     <li><button onClick={logout}>Sign Out</button></li>
                 </ul>
             </nav>
+            {notif && <div className="notif">{notif}</div>}
         </header>
       )}
       <main>

@@ -83,6 +83,17 @@ nav a:hover {
   background-color: #777;
 }
 
+.notif {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  background: #333;
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  z-index: 1000;
+}
+
 /* Main */
 
 main {
@@ -114,4 +125,5 @@ main {
     max-width: none;
   }
 }
+
 
