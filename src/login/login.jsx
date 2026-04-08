@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthState } from './authState';
+import './login.css';
 
 export function Login({ userName, authState, onAuthChange }) {
   const [email, setEmail] = React.useState('');
@@ -34,7 +35,7 @@ export function Login({ userName, authState, onAuthChange }) {
   }
 
   return (
-    <main>
+    <main className="login-page">
       <h2>Sign in to get started</h2>
       <div>
         <div>
