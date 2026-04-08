@@ -113,4 +113,4 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 - [x] **Frontend makes WebSocket connection** - Backend webSocket management executed in `src/musicNotifier.js`.
 - [x] **Data sent over WebSocket connection** - JSON representation of updates to reviews and scores.
 - [x] **WebSocket data displayed** - New review notifications displayed globally and scores on song.jsx update in real time.
-- [ ] **Application is fully functional** -
+- [X] **Application is fully functional** - Sorting and filtering could use some more testing with the API calling, but for the most part, the app is functional.
