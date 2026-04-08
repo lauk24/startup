@@ -1,21 +1,24 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useSearchParams } from 'react-router-dom';
+import './search-results.css'; 
 
 function SongCard({song}){
     return (
         <div className='song-card'>
-            <Link to={`/song/${song.mbid}`}>
-                <img src={song.albumCover} alt="Album Art" width="100" height="100" onError={(e) => { e.target.src = '/song_cover.jpg'; }}/>
-            </Link>
-            <div>
-                <p>{song.title}</p>
-                <p>{song.artist}</p>
-                <p>{song.album}</p>
+            <div className="album-art">
+                <Link to={`/song/${song.mbid}`}>
+                    <img src={song.albumCover} alt="Album Art" width="100" height="100" onError={(e) => { e.target.src = '/song_cover.jpg'; }}/>
+                </Link>
+            </div>
+            <div className="song-info">
+                <div className="song-title">{song.title}</div>
+                <div className="song-sub">{song.artist} • {song.album}</div>
+                <div className="rating">Rating: {song.userRating ? song.userRating.toFixed(1) : 'N/A'}</div>
             </div>
         </div>
-        );
-    }
+    );
+}
 
 export function SearchResults() {
     const [searchParams] = useSearchParams();
@@ -50,14 +53,51 @@ export function SearchResults() {
                     artist: recording['artist-credit']?.[0]?.name ?? 'Unknown Artist',
                     album: release?.title ?? 'Unknown Album',
                     releaseId: release?.id ?? null,
+                    releaseDate: release?.date ?? '',
                     albumCover: release?.id
                     ? `https://coverartarchive.org/release/${release.id}/front-250`
                     : '/song_cover.jpg',
+                    userRating: 0,
                 };
             });
-            setResults(songs);
-        });
+            const mbids = songs.map(s => s.mbid).join(',');
+            fetch(`/api/ratings?mbids=${mbids}`)
+                .then(res => res.json())
+                .then(ratingsData => {
+                    const songsWithRatings = songs.map(song => ({
+                        ...song,
+                        userRating: ratingsData[song.mbid] ?? 0,
+                    }));
+                    setResults(songsWithRatings); 
+                })
+                .catch(() => setResults(songs)); 
+        })
+        .catch(() => setResults([]))
+        .finally(() => setLoading(false));
     }, [query]);
+
+    React.useEffect(() => {
+        setResults(prevResults => {
+            const sorted = [...prevResults];
+            switch(sortBy) {
+            case 'rating':
+                sorted.sort((a, b) => (b.userRating ?? 0) - (a.userRating ?? 0));
+                break;
+            case 'artist':
+                sorted.sort((a, b) => a.artist.localeCompare(b.artist));
+                break;
+            case 'newest-released':
+                sorted.sort((a, b) => (b.releaseDate || '').localeCompare(a.releaseDate || ''));
+                break;
+            case 'oldest-released':
+                sorted.sort((a, b) => (a.releaseDate || '').localeCompare(b.releaseDate || ''));
+                break;
+            default:
+                break;
+            }
+            return sorted;
+        });
+    }, [sortBy]);
 
     return (
         <main>
@@ -66,11 +106,8 @@ export function SearchResults() {
                 <form>
                     <select value={sortBy} onChange={(e) => setSortby(e.target.value)}>
                         <option value="rating">Rating</option>
-                        <option value="newest-added">Newest Added</option>
-                        <option value="oldest-added">Oldest Added</option>
                         <option value="newest-released">Newest Released</option>
                         <option value="oldest-released">Oldest Released</option>
-                        <option value="artist">Artist</option>
                     </select>
                 </form>
             </section>

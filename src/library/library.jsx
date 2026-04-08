@@ -34,6 +34,21 @@ export function Library() {
         song.title?.toLowerCase().includes(query.toLowerCase()) ||
         song.artist?.toLowerCase().includes(query.toLowerCase())
     )
+    .sort((a, b) => {
+        switch (sortBy) {
+            case 'rating':
+            return (b.userRating ?? 0) - (a.userRating ?? 0);
+            case 'artist':
+            return a.artist.localeCompare(b.artist);
+            case 'newest-released':
+            return (b.releaseDate || '').localeCompare(a.releaseDate || '');
+            case 'oldest-released':
+            return (a.releaseDate || '').localeCompare(b.releaseDate || '');
+            default:
+            return 0;
+        }
+    });
+
 
     return (
         <main>
@@ -45,14 +60,14 @@ export function Library() {
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Search your library..."
                 />
-                <select value={sortBy} onChange={(e) => setSortby(e.target.value)}>
+                {/* <select value={sortBy} onChange={(e) => setSortby(e.target.value)}>
                     <option value="rating">Rating</option>
                     <option value="newest-added">Newest Added</option>
                     <option value="oldest-added">Oldest Added</option>
                     <option value="newest-released">Newest Released</option>
                     <option value="oldest-released">Oldest Released</option>
                     <option value="artist">Artist</option>
-                </select>
+                </select> */}
             </section>
             <div className="library-list">
                 {filteredSongs.map((song) => <SongCard key={song.mbid} song={song}/>)}
