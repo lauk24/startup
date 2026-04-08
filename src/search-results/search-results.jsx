@@ -27,28 +27,35 @@ export function SearchResults() {
     React.useEffect(() => {
         if (!query) return;
         setLoading(true);
-        fetch(`https://musicbrainz.org/ws/2/recording/?query=${encodeURIComponent(query)}&limit=10&fmt=json`, {
-                headers: {'User-Agent': 'SoundEscape/1.0 (kentlau@byu.edu)'}
+        const searchQuery = `
+        recording:(${query})^3 OR 
+        artist:(${query})^2 OR
+        release:(${query})
+        `;
+        fetch(`https://musicbrainz.org/ws/2/recording/?query=${encodeURIComponent(searchQuery)}&limit=15&fmt=json`, {
+            headers: { 'User-Agent': 'SoundEscape/1.0 (kentlau@byu.edu)' }
         })
         .then((res) => res.json())
         .then((data) => {
-            const songs = data.recordings.map((recording) => ({
-                mbid: recording.id,
-                title: recording.title,
-                artist: recording['artist-credit']?.[0]?.name ?? 'Unknown Artist',
-                album: recording.releases?.[0]?.title ?? 'Unknown Album',
-                releaseId: recording.releases?.[0]?.id ?? null,
-                albumCover: recording.releases?.[0]?.id
-                    ? `https://coverartarchive.org/release/${recording.releases[0].id}/front`
+        const songs = data.recordings
+            .filter(r => r.releases && r.releases.length > 0 && r.score > 60)
+            .sort((a, b) => b.score - a.score)
+            .map((recording) => {
+                const release =
+                recording.releases?.find(r => r.status === "Official") ||
+                recording.releases?.[0];
+                return {
+                    mbid: recording.id,
+                    title: recording.title,
+                    artist: recording['artist-credit']?.[0]?.name ?? 'Unknown Artist',
+                    album: release?.title ?? 'Unknown Album',
+                    releaseId: release?.id ?? null,
+                    albumCover: release?.id
+                    ? `https://coverartarchive.org/release/${release.id}/front-250`
                     : '/song_cover.jpg',
-            }));
+                };
+            });
             setResults(songs);
-        })
-        .catch(() => {
-            setResults([]);
-        })
-        .finally(() => {
-            setLoading(false);
         });
     }, [query]);
 
