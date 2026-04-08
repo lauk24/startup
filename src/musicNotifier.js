@@ -18,10 +18,9 @@ class MusicEventNotifier {
     let port = window.location.port;
     const protocol = window.location.protocol === 'http:' ? 'ws' : 'wss';
     this.socket = new WebSocket(`${protocol}://${window.location.hostname}:${port}/ws`);
-              this.socket.onopen = (event) => {
-                console.log('WebSocket connected!');
-                this.receiveEvent(new EventMessage('system', MusicEvent.System, { msg: 'connected' }));
-              };
+    this.socket.onopen = (event) => {
+      this.receiveEvent(new EventMessage('system', MusicEvent.System, { msg: 'connected' }));
+    };
     this.socket.onclose = (event) => {
       this.receiveEvent(new EventMessage('system', MusicEvent.System, { msg: 'disconnected' }));
     };

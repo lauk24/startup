@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
+import { MusicNotifier, MusicEvent } from '../musicNotifier';
 
 export function Song() {
     const { id } = useParams();
@@ -42,6 +43,19 @@ export function Song() {
             .then((data) => setCommunityRating(data.averageRating))
             .catch(() => setCommunityRating(null));
 
+    }, [id]);
+
+    React.useEffect(() => {
+        const handler = (event) => {
+            if (event.type === MusicEvent.NewRating) {
+            fetch(`/api/ratings/${id}`)
+                .then((res) => res.json())
+                .then((data) => setCommunityRating(data.averageRating))
+                .catch(() => setCommunityRating(null));
+            }
+        };
+        MusicNotifier.addHandler(handler);
+        return () => MusicNotifier.removeHandler(handler);
     }, [id]);
 
     if (loading) return <main><p>Loading...</p></main>;

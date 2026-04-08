@@ -106,3 +106,11 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 - [x] **Stores data in MongoDB** - User's library and global ratings stored in MongoDB from `service/database.js`.
 - [x] **Stores credentials in MongoDB** - Auth stored in MongoDB from `service/database.js`.
+
+For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
+
+- [x] **Backend listens for WebSocket connection** - Backend webSocket management executed in `service/peerProxy.js`.
+- [x] **Frontend makes WebSocket connection** - Backend webSocket management executed in `src/musicNotifier.js`.
+- [x] **Data sent over WebSocket connection** - JSON representation of updates to reviews and scores.
+- [x] **WebSocket data displayed** - New review notifications displayed globally and scores on song.jsx update in real time.
+- [ ] **Application is fully functional** -
